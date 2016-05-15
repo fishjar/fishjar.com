@@ -4,8 +4,6 @@ title: About
 permalink: /about/
 ---
 
-## Bio
-
 生于八十年代，长于南岭溪隅。
 
 寒窗数载，未及义务教育之免费，不见高等学校之分配。
@@ -27,3 +25,5 @@ Location: Guangzhou, China
 E-mail: Yugang2002 [at] Gmail [dot] com
 
 Twitter: twitter.com/fishjar
+
+Homepage: fishjar.com
