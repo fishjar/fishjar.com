@@ -4,7 +4,7 @@ comments: true
 date: 2010-11-11 05:14:05+00:00
 layout: post
 link: https://fishjar.wordpress.com/2010/11/11/%e4%bb%8e%e7%8f%a0%e6%b5%b7%e5%88%b0%e4%b8%8a%e6%b5%b7/
-slug: 'from zhuhai to shanghai'
+slug: 'from-zhuhai-to-shanghai'
 title: 从珠海到上海
 wordpress_id: 158
 ---
