@@ -72,11 +72,11 @@ Writing superblocks and filesystem accounting information: done
 ```
 设置挂载点及开机挂载
 ``` bash
+ubuntu@ubuntu:/etc$ echo '/dev/vdb /data ext4 defaults 0 0' >> /etc/fstab
+-bash: /etc/fstab: Permission denied
 ubuntu@ubuntu:/etc$ sudo echo '/dev/vdb /data ext4 defaults 0 0' >> /etc/fstab
 -bash: /etc/fstab: Permission denied
-ubuntu@ubuntu:/etc$ cd
-ubuntu@ubuntu:~$ sudo echo '/dev/vdb /data ext4 defaults 0 0' >> /etc/fstab
--bash: /etc/fstab: Permission denied
+
 ```
 看来出错了，权限不够，sudo也不行
 切换root用户试试
