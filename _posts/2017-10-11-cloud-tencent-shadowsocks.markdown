@@ -146,7 +146,7 @@ locale.Error: unsupported locale setting
 出错了，网上查了资料，具体原因我也不清楚，
 好在解决方法很简单，执行`export LC_ALL=C`，然后再安装shadowsocks
 ``` bash
-root@VM-100-136-ubuntu:~# export LC_ALL=C
+root@ubuntu:~# export LC_ALL=C
 root@ubuntu:~# pip install git+https://github.com/shadowsocks/shadowsocks.git@master
 Collecting git+https://github.com/shadowsocks/shadowsocks.git@master
   Cloning https://github.com/shadowsocks/shadowsocks.git (to master) to /tmp/pip-_ucYLA-build
