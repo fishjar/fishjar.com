@@ -11,12 +11,14 @@ tags:
 基于腾讯云搭建一个shadowsocks，还算比较简单的，遇到几个小坑，过程有惊无险，特记录一下。
 
 ## 购买腾讯云服务器
-官网：`https://console.cloud.tencent.com/`
+官网：`https://cloud.tencent.com/`
 过程不表，记得不要选国内区域即可。
 我买的香港一区，1核 1GB 2Mbps，系统Ubuntu
 
 
-## 一些配置，挂载硬盘及启用root（与shadowsocks无关）
+## 一些配置
+> 挂载硬盘及启用root
+> 与新服务器有关，与shadowsocks无关
 
 因为买的时候还买了一块数据盘，但是腾讯云不会自动挂载，因此需要挂载到系统，否则浪费了
 登录：`ssh ubuntu@*.*.*.*`
