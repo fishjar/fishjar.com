@@ -106,7 +106,8 @@ source ~/.profile
 所以为了方便系统执行文件，也可以把工作目录下的`bin`目录添加到环境变量。
 
 ``` bash
-export PATH=$PATH:$HOME/go/bin
+export GOPATH=$HOME/work
+export PATH=$PATH:$GOPATH/bin
 ```
 
 
