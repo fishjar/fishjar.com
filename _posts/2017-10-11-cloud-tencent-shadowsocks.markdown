@@ -11,7 +11,7 @@ tags:
 基于腾讯云搭建一个shadowsocks，还算比较简单的，遇到几个小坑，过程有惊无险，特记录一下。
 
 ## 购买腾讯云服务器
-官网：`https://cloud.tencent.com/`
+官网：<https://cloud.tencent.com/>
 过程不表，记得不要选国内区域即可。
 我买的香港一区，1核 1GB 2Mbps，系统Ubuntu
 
@@ -119,7 +119,7 @@ tmpfs              88508       0     88508   0% /run/user/500
 
 ## 安装shadowsocks
 
-参照[官方指引]: https://github.com/shadowsocks/shadowsocks/tree/master
+参照[官方指引]: <https://github.com/shadowsocks/shadowsocks/tree/master>
 因为是新服务器，pip都还没有安装
 ``` bash
 ubuntu@ubuntu:~$ su root
@@ -224,7 +224,7 @@ INFO: loading config from /etc/shadowsocks.json
 ```
 
 
-多用户配置，参考: https://github.com/shadowsocks/shadowsocks/wiki/Configure-Multiple-Users
+多用户配置，参考: <https://github.com/shadowsocks/shadowsocks/wiki/Configure-Multiple-Users>
 
 ```
 root@ubuntu:/etc# cat shadowsocks.json
