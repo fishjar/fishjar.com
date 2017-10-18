@@ -28,7 +28,7 @@ curl -O https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz
 或者
 
 ``` bash
-wget -O https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz
+wget https://storage.googleapis.com/golang/go1.9.1.linux-amd64.tar.gz
 ```
 
 ## 解压文件
