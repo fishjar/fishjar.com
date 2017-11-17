@@ -1,13 +1,13 @@
 ---
 layout: post
-title:  "JavaScript笔记"
+title:  "JavaScript笔记(1)"
 tags:
   - JS
   - JavaScript
 ---
 
 
-# JavaScript笔记
+# JavaScript笔记(1)
 
 
 
@@ -1917,28 +1917,1124 @@ var extend = function (to, from) {
 
 
 
+## 面向对象
+
+
+> 对象是单个实物的抽象。
+> 对象是一个容器，封装了属性（property）和方法（method）。
+
+
+典型的面向对象编程语言（比如 C++ 和 Java），存在“类”（class）这个概念。所谓“类”就是对象的模板，对象就是“类”的实例。但是，JavaScript 语言的对象体系，不是基于“类”的，而是基于构造函数（constructor）和原型链（prototype）。
+
+构造函数的特点
+
+> 函数体内部使用了this关键字，代表了所要生成的对象实例。
+> 生成对象的时候，必需用new命令。
+
+new命令的作用，就是执行构造函数，返回一个实例对象。
+
+
+构造函数内部判断是否使用new命令，如果发现没有使用，则直接返回一个实例对象。
+
+```
+function Fubar(foo, bar) {
+  if (!(this instanceof Fubar)) {
+    return new Fubar(foo, bar);
+  }
+
+  this._foo = foo;
+  this._bar = bar;
+}
+
+Fubar(1, 2)._foo // 1
+(new Fubar(1, 2))._foo // 1
+```
+
+使用new命令时，它后面的函数调用就不是正常的调用，而是依次执行下面的步骤。
+
+> 创建一个空对象，作为将要返回的对象实例
+> 将这个空对象的原型，指向构造函数的prototype属性
+> 将这个空对象赋值给函数内部的this关键字
+> 开始执行构造函数内部的代码
+
+
+如果构造函数内部有return语句，而且return后面跟着一个对象，new命令会返回return语句指定的对象；否则，就会不管return语句，返回this对象。
+
+```
+var Vehicle = function (){
+  this.price = 1000;
+  return { price: 2000 };
+};
+
+(new Vehicle()).price
+// 2000
+```
+另一方面，如果对普通函数（内部没有this关键字的函数）使用new命令，则会返回一个空对象。
+
+
+new命令简化的内部流程，可以用下面的代码表示。
+
+
+```
+function _new(/* 构造函数 */ constructor, /* 构造函数参数 */ param1) {
+  // 将 arguments 对象转为数组
+  var args = [].slice.call(arguments);
+  // 取出构造函数
+  var constructor = args.shift();
+  // 创建一个空对象，继承构造函数的 prototype 属性
+  var context = Object.create(constructor.prototype);
+  // 执行构造函数
+  var result = constructor.apply(context, args);
+  // 如果返回结果是对象，就直接返回，则返回 context 对象
+  return (typeof result === 'object' && result != null) ? result : context;
+}
+
+// 实例
+var actor = _new(Person, '张三', 28);
+```
+
+
+函数内部可以使用new.target属性。如果当前函数是new命令调用，new.target指向当前函数，否则为undefined。
+```
+function f() {
+  console.log(new.target === f);
+}
+
+f() // false
+new f() // true
+```
+
+```
+function f() {
+  if (!new.target) {
+    throw new Error('请使用 new 命令调用！');
+  }
+  // ...
+}
+
+f() // Uncaught Error: 请使用 new 命令调用！
+```
+
+
+### 使用 Object.create() 创建实例对象
+
+构造函数作为模板，可以生成实例对象。但是，有时只能拿到实例对象，而该对象根本就不是由构造函数生成的，这时可以使用Object.create()方法，直接以某个实例对象作为模板，生成一个新的实例对象。
+
+
+```
+var person1 = {
+  name: '张三',
+  age: 38,
+  greeting: function() {
+    console.log('Hi! I\'m ' + this.name + '.');
+  }
+};
+
+var person2 = Object.create(person1);
+
+person2.name // 张三
+person2.greeting() // Hi! I'm 张三.
+```
+
+
+## this 关键字
+
+this总是返回一个对象，简单说，就是返回属性或方法“当前”所在的对象。
+
+```
+function f() {
+  return '姓名：'+ this.name;
+}
+
+var A = {
+  name: '张三',
+  describe: f
+};
+
+var B = {
+  name: '李四',
+  describe: f
+};
+
+A.describe() // "姓名：张三"
+B.describe() // "姓名：李四"
+```
+
+
+```
+var A = {
+  name: '张三',
+  describe: function () {
+    return '姓名：'+ this.name;
+  }
+};
+
+var name = '李四';
+var f = A.describe;
+f() // "姓名：李四"
+```
+上面代码中，A.describe被赋值给变量f，内部的this就会指向f运行时所在的对象（本例是顶层对象）。
+
+
+总结一下，JavaScript 语言之中，一切皆对象，运行环境也是对象，所以函数都是在某个对象之中运行，this就是这个对象（环境）。
+
+
+> 在全局环境使用this，它指的就是顶层对象window。
+> 构造函数中的this，指的是实例对象。
+> 当 A 对象的方法被赋予 B 对象，该方法中的this就从指向 A 对象变成了指向 B 对象。所以要特别小心，将某个对象的方法赋值给另一个对象，会改变this的指向。
+
+
+但是，只有这一种用法（直接在obj对象上调用foo方法），this指向obj；
+其他用法时，this都指向代码块当前所在对象（浏览器为window对象）。
+
+
+```
+// 情况一
+(obj.foo = obj.foo)() // window
+
+// 情况二
+(false || obj.foo)() // window
+
+// 情况三
+(1, obj.foo)() // window
+```
+可以这样理解，在 JavaScript 引擎内部，obj和obj.foo储存在两个内存地址，简称为M1和M2。只有obj.foo()这样调用时，是从M1调用M2，因此this指向obj。但是，上面三种情况，都是直接取出M2进行运算，然后就在全局环境执行运算结果（还是M2），因此this指向全局环境。
+
+上面三种情况等同于下面的代码。
+
+```
+// 情况一
+(obj.foo = function () {
+  console.log(this);
+})()
+// 等同于
+(function () {
+  console.log(this);
+})()
+
+// 情况二
+(false || function () {
+  console.log(this);
+})()
+
+// 情况三
+(1, function () {
+  console.log(this);
+})()
+```
+
+如果某个方法位于多层对象的内部，这时this只是指向当前一层的对象，而不会继承更上面的层。
+
+```
+var a = {
+  b: {
+    m: function() {
+      console.log(this.p);
+    },
+    p: 'Hello'
+  }
+};
+
+var hello = a.b.m;
+hello() // undefined
+```
+为了避免这个问题，可以只将m所在的对象赋值给hello，这样调用时，this的指向就不会变。
+
+```
+var hello = a.b;
+hello.m() // Hello
+```
+
+foreach方法的回调函数中的this，其实是指向window对象
+数组的map和foreach方法，允许提供一个函数作为参数。这个函数内部不应该使用this。
+
+
+```
+var o = {
+  v: 'hello',
+  p: [ 'a1', 'a2' ],
+  f: function f() {
+    this.p.forEach(function (item) {
+      console.log(this.v + ' ' + item);
+    }, this);
+  }
+}
+
+o.f()
+// hello a1
+// hello a2
+```
+
+## 绑定 this 的方法
+
+JavaScript提供了call、apply、bind这三个方法，来切换/固定this的指向。
+
+### function.prototype.call()
+函数实例的call方法，可以指定函数内部this的指向（即函数执行时所在的作用域），然后在所指定的作用域中，调用该函数。
+
+```
+var obj = {};
+
+var f = function () {
+  return this;
+};
+
+f() === this // true
+f.call(obj) === obj // true
+```
+
+call方法的参数，应该是一个对象。如果参数为空、null和undefined，则默认传入全局对象。
+
+
+```
+var n = 123;
+var obj = { n: 456 };
+
+function a() {
+  console.log(this.n);
+}
+
+a.call() // 123
+a.call(null) // 123
+a.call(undefined) // 123
+a.call(window) // 123
+a.call(obj) // 456
+```
+
+如果call方法的参数是一个原始值，那么这个原始值会自动转成对应的包装对象，然后传入call方法。
+
+
+call方法还可以接受多个参数。
+
+```
+func.call(thisValue, arg1, arg2, ...)
+```
+
+```
+function add(a, b) {
+  return a + b;
+}
+
+add.call(this, 1, 2) // 3
+```
+
+
+call方法的一个应用是调用对象的原生方法。
+
+```
+var obj = {};
+obj.hasOwnProperty('toString') // false
+
+// 覆盖掉继承的 hasOwnProperty 方法
+obj.hasOwnProperty = function () {
+  return true;
+};
+obj.hasOwnProperty('toString') // true
+
+Object.prototype.hasOwnProperty.call(obj, 'toString') // false
+```
+上面代码中，hasOwnProperty是obj对象继承的方法，如果这个方法一旦被覆盖，就不会得到正确结果。call方法可以解决这个问题，它将hasOwnProperty方法的原始定义放到obj对象上执行，这样无论obj上有没有同名方法，都不会影响结果。
+
+
+
+
+
+### function.prototype.apply()
+
+apply方法的作用与call方法类似，也是改变this指向，然后再调用该函数。唯一的区别就是，它接收一个数组作为函数执行时的参数，使用格式如下。
+
+```
+func.apply(thisValue, [arg1, arg2, ...])
+```
+
+JavaScript不提供找出数组最大元素的函数。结合使用apply方法和Math.max方法，就可以返回数组的最大元素。
+
+```
+var a = [10, 2, 4, 15, 9];
+
+Math.max.apply(null, a)
+// 15
+```
+
+
+利用数组对象的slice方法，可以将一个类似数组的对象（比如arguments对象）转为真正的数组。
+
+```
+Array.prototype.slice.apply({0:1,length:1})
+// [1]
+
+Array.prototype.slice.apply({0:1})
+// []
+
+Array.prototype.slice.apply({0:1,length:2})
+// [1, undefined]
+
+Array.prototype.slice.apply({length:1})
+// [undefined]
+```
+
+上面代码的apply方法的参数都是对象，但是返回结果都是数组，这就起到了将对象转成数组的目的。从上面代码可以看到，这个方法起作用的前提是，被处理的对象必须有length属性，以及相对应的数字键。
+
+
+
+### function.prototype.bind()
+
+bind方法用于将函数体内的this绑定到某个对象，然后返回一个新函数。
+
+bind比call方法和apply方法更进一步的是，除了绑定this以外，还可以绑定原函数的参数。
+
+```
+var add = function (x, y) {
+  return x * this.m + y * this.n;
+}
+
+var obj = {
+  m: 2,
+  n: 2
+};
+
+var newAdd = add.bind(obj, 5);
+
+newAdd(5)
+// 20
+```
+上面代码中，bind方法除了绑定this对象，还将add函数的第一个参数x绑定成5，然后返回一个新函数newAdd，这个函数只要再接受一个参数y就能运行了。
+
+如果bind方法的第一个参数是null或undefined，等于将this绑定到全局对象，函数运行时this指向顶层对象（在浏览器中为window）。
+
+对于那些不支持bind方法的老式浏览器，可以自行定义bind方法。
+
+```
+if(!('bind' in Function.prototype)){
+  Function.prototype.bind = function(){
+    var fn = this;
+    var context = arguments[0];
+    var args = Array.prototype.slice.call(arguments, 1);
+    return function(){
+      return fn.apply(context, args);
+    }
+  }
+}
+```
+
+
+bind方法每运行一次，就返回一个新函数，这会产生一些问题。比如，监听事件的时候，不能写成下面这样。
+
+```
+element.addEventListener('click', o.m.bind(o));
+element.removeEventListener('click', o.m.bind(o));
+```
+正确的方法是写成下面这样：
+
+```
+var listener = o.m.bind(o);
+element.addEventListener('click', listener);
+//  ...
+element.removeEventListener('click', listener);
+```
+
+```
+obj.print = function () {
+  this.times.forEach(function (n) {
+    console.log(this.name);
+  }.bind(this));
+};
+
+obj.print()
+// 张三
+// 张三
+// 张三
+```
+
+call方法实质上是调用Function.prototype.call方法
+
+```
+[1, 2, 3].slice(0, 1)
+// [1]
+
+// 等同于
+
+Array.prototype.slice.call([1, 2, 3], 0, 1)
+// [1]
+
+
+
+var slice = Function.prototype.call.bind(Array.prototype.slice);
+
+slice([1, 2, 3], 0, 1) // [1]
+
+// 这种形式的改变还可以用于其他数组方法
+var push = Function.prototype.call.bind(Array.prototype.push);
+var pop = Function.prototype.call.bind(Array.prototype.pop);
+```
+
+如果再进一步，将Function.prototype.call方法绑定到Function.prototype.bind对象，就意味着bind的调用形式也可以被改写。
+
+```
+function f() {
+  console.log(this.v);
+}
+
+var o = { v: 123 };
+
+var bind = Function.prototype.call.bind(Function.prototype.bind);
+
+bind(f, o)() // 123
+```
+上面代码表示，将Function.prototype.call方法绑定Function.prototype.bind以后，bind方法的使用形式从f.bind(o)，变成了bind(f, o)。
 
 
 
 
 
 
+## 原型对象
+
+原型对象的作用，就是定义所有实例对象共享的属性和方法。这也是它被称为原型对象的原因，而实例对象可以视作从原型对象衍生出来的子对象。
+
+```
+var MyArray = function () {};
+
+MyArray.prototype = new Array();
+MyArray.prototype.constructor = MyArray;
+
+var mine = new MyArray();
+mine.push(1, 2, 3);
+
+mine.length // 3
+mine instanceof Array // true
+```
+
+instanceof运算符用来比较一个对象是否为某个构造函数的实例
+
+prototype对象有一个constructor属性，默认指向prototype对象所在的构造函数。
+
+```
+function P() {}
+
+P.prototype.constructor === P
+// true
+```
+由于constructor属性定义在prototype对象上面，意味着可以被所有实例对象继承。
+
+```
+function F() {}
+var f = new F();
+
+f.constructor
+// function F() {}
+
+f.constructor === F // true
+
+f.constructor === F.prototype.constructor
+// true
+
+f.hasOwnProperty('constructor')
+// false
+```
+
+有了constructor属性，就可以从实例新建另一个实例。
+
+```
+function Constr() {}
+var x = new Constr();
+
+var y = new x.constructor();
+y instanceof Constr // true
+```
+修改原型对象时，一般要同时校正constructor属性的指向。
+
+```
+// 避免这种写法
+C.prototype = {
+  method1: function (...) { ... },
+  // ...
+};
+
+// 较好的写法
+C.prototype = {
+  constructor: C,
+  method1: function (...) { ... },
+  // ...
+};
+
+// 更好好的写法
+C.prototype.method1 = function (...) { ... };
+```
+
+
+
+```
+v instanceof Vehicle
+// 等同于
+Vehicle.prototype.isPrototypeOf(v)
+```
+
+由于instanceof对整个原型链上的对象都有效
+
+
+```
+var d = new Date();
+d instanceof Date // true
+d instanceof Object // true
+```
+
+
+
+利用instanceof运算符，还可以巧妙地解决，调用构造函数时，忘了加new命令的问题。
+
+```
+function Fubar (foo, bar) {
+  if (this instanceof Fubar) {
+    this._foo = foo;
+    this._bar = bar;
+  }
+  else {
+    return new Fubar(foo, bar);
+  }
+}
+```
+
+### Object.getPrototypeOf()
+Object.getPrototypeOf 静态方法返回一个对象(实例)的原型。
+
+Object.setPrototypeOf 静态方法可以为现有对象设置原型，返回一个新对象。
+Object.setPrototypeOf 静态方法接受两个参数，第一个是现有对象，第二个是原型对象。
+
+### Object.create
+Object.create 静态方法可以用下面的代码代替。
+如果老式浏览器不支持Object.create方法，可以就用这段代码自己部署。
+
+```
+if (typeof Object.create !== 'function') {
+  Object.create = function (obj) {
+    function F() {}
+    F.prototype = obj;
+    return new F();
+  };
+}
+```
+
+
+object.create方法生成的新对象，动态继承了原型。在原型上添加或修改任何方法，会立刻反映在新对象之上。
+
+除了对象的原型，Object.create方法还可以接受第二个参数。该参数是一个属性描述对象，它所描述的对象属性，会添加到实例对象，作为该对象自身的属性。
+
+
+
+```
+var obj = Object.create({}, {
+  p1: {
+    value: 123,
+    enumerable: true,
+    configurable: true,
+    writable: true,
+  },
+  p2: {
+    value: 'abc',
+    enumerable: true,
+    configurable: true,
+    writable: true,
+  }
+});
+
+// 等同于
+var obj = Object.create({});
+obj.p1 = 123;
+obj.p2 = 'abc';
+```
+
+
+
+### Object.prototype.isPrototypeOf()
+
+对象实例的isPrototypeOf方法，用来判断一个对象是否是另一个对象的原型。
+
+只要某个对象处在原型链上，isPrototypeOf都返回true。
+
+
+
+### Object.prototype.__proto__
+
+__proto__属性指向当前对象的原型对象，即构造函数的prototype属性
+
+
+
+## 获取原型对象方法的比较
+
+> obj.__proto__
+> obj.constructor.prototype
+> Object.getPrototypeOf(obj)
+
+
+```
+var obj = new Object();
+
+obj.__proto__ === Object.prototype
+// true
+obj.__proto__ === obj.constructor.prototype
+// true
+```
+
+
+
+
+## 对象继承
+
+
+### Object.getOwnPropertyNames()
+
+Object.getOwnPropertyNames方法返回一个数组，成员是对象本身的所有属性的键名，
+不论是否可以枚举的（enumerable）,
+不包含继承的属性键名。
+
+只获取那些可以枚举的属性，使用Object.keys方法。
+
+
+
+### Object.prototype.hasOwnProperty()
+对象实例的hasOwnProperty方法返回一个布尔值，用于判断某个属性定义在对象自身，还是定义在原型链上。
+
+hasOwnProperty方法是JavaScript之中唯一一个处理对象属性时，不会遍历原型链的方法。
+
+### in运算符
+
+返回一个布尔值，表示一个对象是否具有某个属性。它不区分该属性是对象自身的属性，还是继承的属性。
+
+in运算符常用于检查一个属性是否存在。
+
+获得对象的所有可枚举属性（不管是自身的还是继承的），可以使用for...in循环。
+
+
+
+
+获得对象的所有属性（不管是自身的还是继承的，以及是否可枚举），可以使用下面的函数。
+
+
+```
+function inheritedPropertyNames(obj) {
+  var props = {};
+  while(obj) {
+    Object.getOwnPropertyNames(obj).forEach(function(p) {
+      props[p] = true;
+    });
+    obj = Object.getPrototypeOf(obj); // 原型对象
+  }
+  return Object.getOwnPropertyNames(props);
+}
+```
+
+
+
+
+## 对象拷贝的函数。
+
+
+
+```
+function copyObject(orig) {
+  var copy = Object.create(Object.getPrototypeOf(orig));
+  copyOwnPropertiesFrom(copy, orig);
+  return copy;
+}
+
+function copyOwnPropertiesFrom(target, source) {
+  Object
+  .getOwnPropertyNames(source)
+  .forEach(function(propKey) {
+    var desc = Object.getOwnPropertyDescriptor(source, propKey);
+    Object.defineProperty(target, propKey, desc);
+  });
+  return target;
+}
+```
 
 
 
 
 
+## 构造函数的继承
+
+第一步是在子类的构造函数中，调用父类的构造函数。
+
+```
+function Sub(value) {
+  Super.call(this);
+  this.prop = value;
+}
+```
+
+第二步，是让子类的原型指向父类的原型，这样子类就可以继承父类原型。
+
+```
+Sub.prototype = Object.create(Super.prototype);
+Sub.prototype.constructor = Sub;
+Sub.prototype.method = '...';
+```
+
+
+举例来说，下面是一个Shape构造函数。
+
+```
+function Shape() {
+  this.x = 0;
+  this.y = 0;
+}
+
+Shape.prototype.move = function (x, y) {
+  this.x += x;
+  this.y += y;
+  console.info('Shape moved.');
+};
+```
+
+我们需要让Rectangle构造函数继承Shape。
+
+```
+// 第一步，子类继承父类的实例
+function Rectangle() {
+  Shape.call(this); // 调用父类构造函数
+}
+// 另一种写法
+function Rectangle() {
+  this.base = Shape;
+  this.base();
+}
+
+// 第二步，子类继承父类的原型
+Rectangle.prototype = Object.create(Shape.prototype);
+Rectangle.prototype.constructor = Rectangle;
+```
+
+
+
+
+## 多重继承
+
+JavaScript 不提供多重继承功能，即不允许一个对象同时继承多个对象。但是，可以通过变通方法，实现这个功能。
+
+
+```
+function M1() {
+  this.hello = 'hello';
+}
+
+function M2() {
+  this.world = 'world';
+}
+
+function S() {
+  M1.call(this);
+  M2.call(this);
+}
+
+// 继承 M1
+S.prototype = Object.create(M1.prototype);
+// 继承链上加入 M2
+Object.assign(S.prototype, M2.prototype);
+
+// 指定构造函数
+S.prototype.constructor = S;
+
+var s = new S();
+s.hello // 'hello：'
+s.world // 'world'
+```
+
+
+
+
+## 封装
+
+### 基本的实现方法
+
+```
+var module1 = new Object({
+　_count : 0,
+　m1 : function (){
+　　//...
+　},
+　m2 : function (){
+  　//...
+　}
+});
+```
+
+
+### 封装私有变量：构造函数的写法
+
+```
+function StringBuilder() {
+  var buffer = [];
+
+  this.add = function (str) {
+     buffer.push(str);
+  };
+
+  this.toString = function () {
+    return buffer.join('');
+  };
+
+}
+```
+
+```
+function StringBuilder() {
+  this._buffer = [];
+}
+
+StringBuilder.prototype = {
+  constructor: StringBuilder,
+  add: function (str) {
+    this._buffer.push(str);
+  },
+  toString: function () {
+    return this._buffer.join('');
+  }
+};
+```
+
+
+### 封装私有变量：立即执行函数的写法
+
+```
+var module1 = (function () {
+　var _count = 0;
+　var m1 = function () {
+　  //...
+　};
+　var m2 = function () {
+　　//...
+　};
+　return {
+　　m1 : m1,
+　　m2 : m2
+　};
+})();
+```
+
+
+### 模块的放大模式
+
+```
+var module1 = (function (mod){
+　mod.m3 = function () {
+　　//...
+　};
+　return mod;
+})(module1);
+```
+
+```
+var module1 = ( function (mod){
+　//...
+　return mod;
+})(window.module1 || {});
+```
+
+
+### 输入全局变量
+
+```
+var module1 = (function ($, YAHOO) {
+　//...
+})(jQuery, YAHOO);
+```
+
+立即执行函数还可以起到命名空间的作用。
+
+```
+(function($, window, document) {
+  function go(num) {}
+  function handleEvents() {}
+  function initialize() {}
+  function dieCarouselDie() {}
+
+  //attach to the global scope
+  window.finalCarousel = {
+    init : initialize,
+    destroy : dieCouraselDie
+  }
+})( jQuery, window, document );
+```
+上面代码中，finalCarousel对象输出到全局，对外暴露init和destroy接口，内部方法go、handleEvents、initialize、dieCarouselDie都是外部无法调用的。
 
 
 
 
 
+## setTimeout()
+推迟执行的代码必须以字符串的形式，放入setTimeout，因为引擎内部使用eval函数，将字符串转为代码。
+
+```
+var timerId = setTimeout(func|code, delay)
+```
+如果被setTimeout推迟执行的回调函数是某个对象的方法，那么该方法中的this关键字将指向全局环境，而不是定义时所在的那个对象。
+
+```
+var x = 1;
+
+var o = {
+  x: 2,
+  y: function(){
+    console.log(this.x);
+  }
+};
+
+setTimeout(o.y,1000);
+// 1
+```
+o.y的this所指向的已经不是o，而是全局环境了。
+
+```
+function User(login) {
+  this.login = login;
+  this.sayHi = function() {
+    console.log(this.login);
+  }
+}
+
+var user = new User('John');
+
+setTimeout(user.sayHi, 1000);
+```
+
+```
+setTimeout(function() {
+  user.sayHi();
+}, 1000);
+```
+
+```
+setTimeout(user.sayHi.bind(user), 1000);
+```
+
+
+## setInterval
+
+指定的是“开始执行”之间的间隔，并不考虑每次任务执行本身所消耗的时间。因此实际上，两次执行之间的间隔会小于指定的时间。
+
+为了确保两次执行之间有固定的间隔，可以不用setInterval，而是每次执行结束后，使用setTimeout指定下一次执行的具体时间。
+
+
+```
+var i = 1;
+var timer = setTimeout(function () {
+  alert(i++);
+  timer = setTimeout(arguments.callee, 2000);
+}, 2000);
+```
+
+根据这种思路，可以自己部署一个函数，实现间隔时间确定的setInterval的效果。
+
+```
+function interval(func, wait){
+  var interv = function(){
+    func.call(null);
+    setTimeout(interv, wait);
+  };
+
+  setTimeout(interv, wait);
+}
+
+interval(function(){
+  console.log(2);
+},1000);
+```
+
+## clearTimeout()，clearInterval()
+
+```
+var id1 = setTimeout(f,1000);
+var id2 = setInterval(f,1000);
+
+clearTimeout(id1);
+clearInterval(id2);
+```
+
+## setTimeout(f, 0)
+
+
+正常任务（task）与微任务（microtask）。它们的区别在于，“正常任务”在下一轮Event Loop执行，“微任务”在本轮Event Loop的所有任务结束后执行。
+
+正常任务包括以下情况。
+
+setTimeout
+setInterval
+setImmediate
+I/O
+各种事件（比如鼠标单击事件）的回调函数
+
+
+微任务目前主要是process.nextTick和 Promise 这两种情况
 
 
 
 
 
+## promise
 
+
+### 串行执行
+
+```
+var items = [ 1, 2, 3, 4, 5, 6 ];
+var results = [];
+function series(item) {
+  if(item) {
+    async( item, function(result) {
+      results.push(result);
+      return series(items.shift());
+    });
+  } else {
+    return final(results);
+  }
+}
+series(items.shift());
+```
+
+### 并行执行
+
+```
+var items = [ 1, 2, 3, 4, 5, 6 ];
+var results = [];
+
+items.forEach(function(item) {
+  async(item, function(result){
+    results.push(result);
+    if(results.length == items.length) {
+      final(results);
+    }
+  })
+});
+```
+
+### 并行与串行的结合
+
+```
+var items = [ 1, 2, 3, 4, 5, 6 ];
+var results = [];
+var running = 0;
+var limit = 2;
+
+function launcher() {
+  while(running < limit && items.length > 0) {
+    var item = items.shift();
+    async(item, function(result) {
+      results.push(result);
+      running--;
+      if(items.length > 0) {
+        launcher();
+      } else if(running == 0) {
+        final(results);
+      }
+    });
+    running++;
+  }
+}
+
+launcher();
+```
 
 
 
