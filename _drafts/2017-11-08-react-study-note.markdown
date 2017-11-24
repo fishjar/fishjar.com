@@ -943,13 +943,102 @@ app.use(express.static(__dirname + '/build'))
 
 // handle every other route with index.html, which will contain
 // a script tag to your application's JavaScript file(s).
-app.get('*', function (request, response){
+app.get('/*', function (request, response){
   response.sendFile(path.resolve(__dirname, 'build', 'index.html'))
 })
 
 app.listen(port)
 console.log("server started on port " + port)
 ```
+
+
+
+
+
+
+
+
+## 动态加载组件
+
+moduleA.js
+
+```
+const moduleA = 'Hello';
+
+export { moduleA };
+```
+
+App.js
+
+```
+import React, { Component } from 'react';
+
+class App extends Component {
+  handleClick = () => {
+    import('./moduleA')
+      .then(({ moduleA }) => {
+        // Use moduleA
+      })
+      .catch(err => {
+        // Handle failure
+      });
+  };
+
+  render() {
+    return (
+      <div>
+        <button onClick={this.handleClick}>Load</button>
+      </div>
+    );
+  }
+}
+
+export default App;
+```
+
+
+## 环境变量
+
+默认情况下，NODE_ENV已经为你定义了， 还有一些其他环境变量，以REACT_APP_开头的变量。
+
+### 在shell中临时添加环境变量
+
+```
+// Windows (cmd.exe)
+set REACT_APP_SECRET_CODE=abcdef&&npm start
+// 注意，变量名和变量值之间没有空格
+// Linux, macOS (Bash)
+REACT_APP_SECRET_CODE=abcdef npm start
+```
+
+
+### 在.env中添加开发环境变量
+
+要定义持久环境变量，可以在项目根目录下面创建一个.env文件:
+
+```
+REACT_APP_SECRET_CODE=abcdef
+```
+
+
+
+
+
+
+```
+if (process.env.NODE_ENV !== 'production') {
+  analytics.disable();
+}
+```
+
+
+
+
+
+
+
+
+
 
 
 
