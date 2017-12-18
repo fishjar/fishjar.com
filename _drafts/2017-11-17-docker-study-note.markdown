@@ -82,7 +82,7 @@ Successfully tagged my-app:v1
 
 ```
 
-运行镜像（创建容器）
+运行镜像（创建并运行容器）
 
 ```
 $ docker run --name my-app -d -p 9001:80 my-app:v1
