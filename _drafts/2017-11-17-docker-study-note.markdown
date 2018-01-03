@@ -230,7 +230,8 @@ docker-compose ps
 
 
 
-
+## 构建image
+docker build -t <friendlyhello> .
 
 
 
@@ -255,9 +256,13 @@ aghuri48m990h2400jscx6u8s *   gabe-desktop        Ready               Active    
 z8h9uysgv9xi65hirz352b9ie     worker1             Down                Active              
 yqnmc4e8ei6ci3ha466gis0kf     worker2             Down                Active    
 
+## 创建swarm
+docker swarm init
 
-## 登录虚拟机并初始化 docker swarm
+## 登录虚拟机并初始化 
+
 docker-machine ssh myvm1 "docker swarm init --advertise-addr 192.168.99.100"
+docker-machine ssh myvm1 "docker swarm init --advertise-addr 192.168.99.100:2376"
 
 Swarm initialized: current node (7x7elefbphwfn0icjs5f4cq3d) is now a manager.
 
@@ -267,8 +272,24 @@ To add a worker to this swarm, run the following command:
 
 To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
 
+### 119
+docker swarm join --token SWMTKN-1-2znbuidmztgk6vh5uw6krfb1sw7oobuu09qxqobk5qxzkzyyan-ds30v3mheo85sz7bxizfbicsw 10.144.100.136:2377
+
 ## 登录虚拟机并加入 docker swarm
+https://github.com/docker/machine/issues/4064
+
+### Ports 2377 and 2376
+
+Always run docker swarm init and docker swarm join with port 2377 (the swarm management port), or no port at all and let it take the default.
+
+The machine IP addresses returned by docker-machine ls include port 2376, which is the Docker daemon port. Do not use this port or you may experience errors.
+
+
 docker-machine ssh myvm2 "docker swarm join --token SWMTKN-1-2itze37brrcof7sevmpiq91rpgi0r4muqqnv9lpr2cntay05lj-2vlg4uziti5yjk7lroxznrzwc 192.168.99.100:2377"
+
+docker-machine ssh myvm2 "docker swarm join --token SWMTKN-1-06lta48184qbqnvaw4xmeaegopqc7scrz05xbh2pkl7vwf32l8-b33u1bqj1233akabgpl90qptw 192.168.99.100:2377"
+
+
 
 
 
@@ -279,6 +300,9 @@ ID                            HOSTNAME            STATUS              AVAILABILI
 7x7elefbphwfn0icjs5f4cq3d *   myvm1               Ready               Active              Leader
 s368e1xkmxln4a87vxq25xfa5     myvm2               Ready               Active         
 
+
+## 离开swarm
+docker swarm leave
 
 ## 查看虚拟机环境变量
 docker-machine env myvm1
@@ -423,3 +447,13 @@ docker-machine stop $(docker-machine ls -q)               # Stop all running VMs
 docker-machine rm $(docker-machine ls -q) # Delete all VMs and their disk images
 
 
+
+
+
+docker-machine -> 
+
+docker swarm -> docker node
+
+docker stack deploy -> docker sevice
+
+docker stack ps -> docker container
