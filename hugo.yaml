@@ -1,0 +1,34 @@
+baseURL: "http://fishjar.com"
+title: "Gabe Yuan"
+googleAnalytics: "UA-589919-20"
+languageCode: "zh-CN"
+hasCJKLanguage: true
+
+params:
+  description: "Life was like a box of chocolates. You never know what you're gonna get."
+  author: "Gabe Yuan"
+  email: "Yugang2002@Gmail.com"
+  twitter_username: "FishJar"
+  github_username: "FishJar"
+
+permalinks:
+  blog: /blog/:year/:slug/
+
+uglyURLs: false
+
+pagination:
+  pagerSize: 10
+
+# 构建设置
+markup:
+  goldmark:
+    renderer:
+      unsafe: true # 允许在 Markdown 中保留 HTML
+  highlight:
+    codeFences: true
+    guessSyntax: true
+    lineNos: true
+    style: monokai
+
+# 本地化时间设置
+timezone: "Asia/Shanghai"

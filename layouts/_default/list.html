@@ -1,0 +1,54 @@
+{{ define "main" }}
+<div class="blog">
+
+  <ul class="post-list">
+    {{/* 优化点: 移除 "blog" 写死, 使 list 模板能自适应各 Section 和 Taxonomy。如果是首页则读取所有主要 Section */}}
+    {{ $pages := .Pages }}
+    {{ if .IsHome }}
+      {{ $pages = where site.RegularPages "Type" "in" site.Params.mainSections }}
+    {{ end }}
+    {{ $paginator := .Paginate $pages }}
+    {{ range $paginator.Pages }}
+      <li>
+        <span class="post-meta">{{ .Date.Format "Jan 2, 2006" }}</span>
+
+        <h2>
+          <a class="post-link" href="{{ .Permalink }}">{{ .Title }}</a>
+        </h2>
+
+        <div class="post-summary">
+          {{ .Summary }}
+          {{ if .Truncated }}
+            <p><a class="read-more" href="{{ .Permalink }}">阅读全文...</a></p>
+          {{ end }}
+        </div>
+
+      </li>
+    {{ end }}
+  </ul>
+
+  {{ if gt $paginator.TotalPages 1 }}
+  <div class="pagination">
+    {{ if $paginator.HasPrev }}
+      <a href="{{ $paginator.Prev.URL }}">&laquo; Prev</a>
+    {{ else }}
+      <span>&laquo; Prev</span>
+    {{ end }}
+
+    {{ range $paginator.Pagers }}
+      {{ if eq . $paginator }}
+        <em>{{ .PageNumber }}</em>
+      {{ else }}
+        <a href="{{ .URL }}">{{ .PageNumber }}</a>
+      {{ end }}
+    {{ end }}
+
+    {{ if $paginator.HasNext }}
+      <a href="{{ $paginator.Next.URL }}">Next &raquo;</a>
+    {{ else }}
+      <span>Next &raquo;</span>
+    {{ end }}
+  </div>
+  {{ end }}
+</div>
+{{ end }}

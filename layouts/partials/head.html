@@ -1,0 +1,23 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
+  <meta name="description" content="{{ with .Description | default .Summary | default .Site.Params.description }}{{ . | plainify | htmlUnescape | truncate 160 }}{{ end }}">
+
+  {{/* Hugo 最佳实践: 引入内置的 SEO 模板和社交图谱 */}}
+  {{ template "_internal/opengraph.html" . }}
+  {{ template "_internal/twitter_cards.html" . }}
+  {{ template "_internal/schema.html" . }}
+
+  {{ $sass := resources.Get "css/main.scss" }}
+  {{/* 优化点: 添加 minify 进行 CSS 压缩以提升线上性能 */}}
+  {{ $style := $sass | css.Sass | minify | fingerprint }}
+  <link rel="stylesheet" href="{{ $style.RelPermalink }}">
+  <link rel="canonical" href="{{ .Permalink }}">
+  {{ with .OutputFormats.Get "rss" }}
+  <link rel="alternate" type="{{ .MediaType.Type }}" title="{{ $.Site.Title }}" href="{{ .Permalink }}">
+  {{ end }}
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>

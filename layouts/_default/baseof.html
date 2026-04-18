@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+{{/* 优化点: 使用最新内置变量 site.Language.Lang 和 dir 支持多语言及其方向 */}}
+<html lang="{{ site.Language.Lang | default "zh-CN" }}" dir="{{ site.Language.LanguageDirection | default "ltr" }}">
+  {{ partial "head.html" . }}
+  <body>
+
+    {{ partial "header.html" . }}
+
+    <main class="page-content" id="main-content">
+      <div class="wrapper">
+        {{ block "main" . }}{{ end }}
+      </div>
+    </main>
+
+    {{ partial "footer.html" . }}
+    {{/* 优化点: 使用 Hugo 内置的 Google Analytics 模板 */}}
+    {{ template "_internal/google_analytics.html" . }}
+
+    {{/* 基础交互脚本 (原 Jekyll default.html 中的脚本) */}}
+    <script>
+      (function () {
+        var toggle = document.querySelector('.menu-toggle');
+        var menu = document.getElementById('site-menu');
+
+        if (!toggle || !menu) {
+          return;
+        }
+
+        toggle.addEventListener('click', function () {
+          var expanded = toggle.getAttribute('aria-expanded') === 'true';
+          toggle.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+          menu.classList.toggle('is-open');
+        });
+
+        menu.addEventListener('click', function (event) {
+          if (event.target.classList.contains('page-link')) {
+            toggle.setAttribute('aria-expanded', 'false');
+            menu.classList.remove('is-open');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
