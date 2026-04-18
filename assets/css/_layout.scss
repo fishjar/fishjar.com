@@ -238,3 +238,75 @@
 .pagination em {
     text-decoration: underline
 }
+
+
+
+/**
+ * 文章上下篇导航
+ */
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid $grey-color-light;
+    font-size: 15px;
+
+    &-prev,
+    &-next {
+        max-width: 48%;
+    }
+
+    &-next {
+        text-align: right;
+        margin-left: auto;
+    }
+
+    .nav-label {
+        display: block;
+        color: $grey-color;
+        font-size: 13px;
+        margin-bottom: 4px;
+    }
+}
+
+
+
+/**
+ * 404 页面
+ */
+.page-not-found {
+    text-align: center;
+    padding: 10vh 20px;
+
+    h1 {
+        font-size: 100px;
+        line-height: 1;
+        margin-bottom: 20px;
+        font-weight: 300;
+        color: #d0d0d0;
+    }
+
+    h2 {
+        font-size: 24px;
+        color: #555;
+        margin-bottom: 20px;
+    }
+
+    p {
+        color: $grey-color;
+        margin-bottom: 40px;
+        font-size: 15px;
+    }
+}
+
+
+
+/**
+ * Giscus 评论区
+ */
+.giscus-comments {
+    margin-top: 60px;
+    padding-top: 30px;
+    border-top: 1px dashed $grey-color-light;
+}

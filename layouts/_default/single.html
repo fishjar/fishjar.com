@@ -17,6 +17,24 @@
 
 </article>
 
+{{/* 仅在博客文章页面显示上一篇/下一篇导航 */}}
+{{ if eq .Section "blog" }}
+<nav class="post-nav">
+  <div class="post-nav-prev">
+    {{ with .NextInSection }}
+    <span class="nav-label">← 上一篇</span>
+    <a href="{{ .Permalink }}">{{ .Title }}</a>
+    {{ end }}
+  </div>
+  <div class="post-nav-next">
+    {{ with .PrevInSection }}
+    <span class="nav-label">下一篇 →</span>
+    <a href="{{ .Permalink }}">{{ .Title }}</a>
+    {{ end }}
+  </div>
+</nav>
+{{ end }}
+
 {{ partial "comments.html" . }}
 
 {{ end }}
