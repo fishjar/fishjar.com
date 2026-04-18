@@ -1,0 +1,24 @@
+{{/* 仅在“博客文章”和“关于”页面展示评论框，防止入侵如归档、等无意义页面 */}}
+{{ if or (eq .Section "blog") (eq .RelPermalink "/about/") }}
+  {{ if .Site.Params.giscus.enable }}
+    <div class="giscus-comments" style="margin-top: 60px; padding-top: 30px; border-top: 1px dashed #e5e5e5;">
+      <h3>留言讨论区 / Comments</h3>
+      <script src="https://giscus.app/client.js"
+              data-repo="{{ .Site.Params.giscus.repo }}"
+              data-repo-id="{{ .Site.Params.giscus.repo_id }}"
+              data-category="{{ .Site.Params.giscus.category }}"
+              data-category-id="{{ .Site.Params.giscus.category_id }}"
+              data-mapping="pathname"
+              data-strict="0"
+              data-reactions-enabled="1"
+              data-emit-metadata="0"
+              data-input-position="bottom"
+              data-theme="preferred_color_scheme"
+              data-lang="zh-CN"
+              data-loading="lazy"
+              crossorigin="anonymous"
+              async>
+      </script>
+    </div>
+  {{ end }}
+{{ end }}

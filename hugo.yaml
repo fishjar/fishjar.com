@@ -5,6 +5,14 @@ languageCode: "zh-CN"
 hasCJKLanguage: true
 
 params:
+  # Giscus 评论系统底层配置
+  giscus:
+    enable: true # 准备完毕后，将此处设为 true 即可全站生效
+    repo: "fishjar/fishjar.com"
+    repo_id: "MDEwOlJlcG9zaXRvcnk1ODI5NzAzMw=="
+    category: "Announcements" # 你的 Github Discussions 对应的类别名称
+    category_id: "DIC_kwDOA3mKyc4C7I2X" # 务必前往 giscus.app 官网获取
+
   description: "Life was like a box of chocolates. You never know what you're gonna get."
   author: "Gabe Yuan"
   email: "Yugang2002@Gmail.com"
