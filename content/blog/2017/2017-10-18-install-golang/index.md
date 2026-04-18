@@ -6,7 +6,7 @@ tags:
   - Go
   - golang
 slug: 'install-golang'
-# draft: true
+draft: true
 ---
 
 Linux安装Go一般有三种方式：

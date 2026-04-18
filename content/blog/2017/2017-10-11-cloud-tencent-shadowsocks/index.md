@@ -8,6 +8,7 @@ tags:
   - 云服务器
   - ubuntu
 slug: 'cloud-tencent-shadowsocks'
+draft: true
 ---
 
 基于腾讯云搭建一个shadowsocks，还算比较简单的，遇到几个小坑，过程有惊无险，特记录一下。
