@@ -1,0 +1,46 @@
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const highlightBlocks = document.querySelectorAll(".highlight");
+
+    highlightBlocks.forEach((block) => {
+      // 创建稳定的相对定位包裹层以便隔离滚动
+      const wrapper = document.createElement("div");
+      wrapper.className = "code-block-wrapper";
+      
+      // 用包装层包裹原有的 highlight 块
+      block.parentNode.insertBefore(wrapper, block);
+      wrapper.appendChild(block);
+
+      const button = document.createElement("button");
+      button.className = "copy-button";
+      button.type = "button";
+      button.innerHTML = "Copy";
+
+      // 放入外层容器中（防止跟着内部代码横向滚动）
+      wrapper.appendChild(button);
+
+      button.addEventListener("click", () => {
+        // 智能定位代码源元素（排除 Hugo 生成的行号左列干扰）
+        const codeNodes = block.querySelectorAll("code");
+        // 如果是带行号的表格式代码结构，提取最后一段 node 就是真实代码实体
+        const targetCodeElem = codeNodes[codeNodes.length - 1]; 
+
+        if (targetCodeElem) {
+          const textToCopy = targetCodeElem.textContent;
+
+          navigator.clipboard.writeText(textToCopy).then(() => {
+            button.innerHTML = "Copied!";
+            button.classList.add("copied");
+
+            setTimeout(() => {
+              button.innerHTML = "Copy";
+              button.classList.remove("copied");
+            }, 2000);
+          }).catch(err => {
+            console.error("Failed to copy code: ", err);
+          });
+        }
+      });
+    });
+  });
+</script>
